@@ -40,11 +40,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            # tag automatically when pushing version tags like v1.2.3
             type=semver,pattern={{version}},prefix=v
-            # latest for tagged releases
-            type=semver,pattern=latest
-            # branch tags for dev or main
             type=ref,event=branch
 
       - name: Build and push Docker image
