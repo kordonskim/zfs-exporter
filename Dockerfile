@@ -10,6 +10,9 @@ WORKDIR /build
 # Clone the repository
 RUN git clone https://github.com/pdf/zfs_exporter.git .
 
+# Download dependencies
+RUN go mod download
+
 # Build the binary
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o zfs_exporter .
 
