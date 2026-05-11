@@ -5,7 +5,11 @@ on:
     tags:
       - 'v*.*.*'
   workflow_dispatch: # allows manual trigger
-
+    inputs:
+      zfs_version:
+        description: 'ZFS Exporter version (e.g. 2.3.12)'
+        required: false
+        default: '2.3.12'
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
@@ -14,7 +18,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
 
     steps:
@@ -42,12 +46,22 @@ jobs:
           tags: |
             type=semver,pattern={{version}},prefix=v
             type=ref,event=branch
-            
+
+      - name: Create and push tag
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag v${{ inputs.zfs_version }}
+          git push origin v${{ inputs.zfs_version }}
+                
       - name: Extract version from tag
         id: version
         run: |
           if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
             echo "ZFS_VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+          elif [[ -n "${{ inputs.zfs_version }}" ]]; then
+            echo "ZFS_VERSION=${{ inputs.zfs_version }}" >> $GITHUB_OUTPUT
           else
             echo "ZFS_VERSION=latest" >> $GITHUB_OUTPUT
           fi
