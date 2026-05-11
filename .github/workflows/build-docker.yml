@@ -1,9 +1,9 @@
 name: Build and Publish Docker Image
 
 on:
-  push:
-    tags:
-      - 'v*.*.*'
+  #push:
+  #  tags:
+  #    - 'v*.*.*'
   workflow_dispatch: # allows manual trigger
     inputs:
       zfs_version:
@@ -54,7 +54,7 @@ jobs:
           tags: |
             type=raw,value=v${{ inputs.zfs_version }},enable=${{ github.event_name == 'workflow_dispatch' }}
             type=semver,pattern={{version}},prefix=v
-            type=ref,event=branch
+          #type=ref,event=branch
         
       - name: Create GitHub Release
         if: github.event_name == 'workflow_dispatch'
