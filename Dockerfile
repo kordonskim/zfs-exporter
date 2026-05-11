@@ -1,6 +1,9 @@
 # Build stage
 FROM golang:1.25-alpine AS builder
 
+# version comes form https://github.com/pdf/zfs_exporter.git
+ARG ZFS_EXPORTER_VERSION=2.3.12
+
 # Install build dependencies
 RUN apk add --no-cache git make gcc musl-dev
 
@@ -8,7 +11,11 @@ RUN apk add --no-cache git make gcc musl-dev
 WORKDIR /build
 
 # Clone the repository
-RUN git clone https://github.com/pdf/zfs_exporter.git .
+RUN if [ "$ZFS_EXPORTER_VERSION" = "latest" ]; then \
+      git clone https://github.com/pdf/zfs_exporter.git .; \
+    else \
+      git clone --branch v${ZFS_EXPORTER_VERSION} --depth 1 https://github.com/pdf/zfs_exporter.git .; \
+    fi
 
 # Download dependencies
 # RUN go mod download
